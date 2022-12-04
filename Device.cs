@@ -8,7 +8,6 @@ using System.Threading.Tasks;
 using System.Windows.Forms.VisualStyles;
 using System.Xml.Linq;
 using NModbus;
-using S7.Net;
 
 namespace Motor_Control
 {
@@ -75,7 +74,7 @@ namespace Motor_Control
         public void Write(object value, string tagname)
         {
             string[] s = tagname.Split('.');
-            ushort tmp = (ushort)value;
+            ushort tmp = (ushort) Convert.ToInt16(value);
             switch (s[0])
             {
                 case "Motor_1":
@@ -128,6 +127,12 @@ namespace Motor_Control
                             Master.WriteSingleRegister(ID, 110, (ushort)(tmp << 7));
                             break;
                     }
+                    break;
+                case "Start":
+                    Master.WriteSingleRegister(ID, 112, tmp);
+                    break;
+                case "Stop":
+                    Master.WriteSingleRegister(ID, 112, (ushort)(tmp << 7));
                     break;
             }
         }

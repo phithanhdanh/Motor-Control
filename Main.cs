@@ -59,7 +59,7 @@ namespace Motor_Control
         {
             if (Dev != null)
             {
-                Dev.thePLC.Write("DB6.DBX0.0", true);
+                Dev.Write(1, "Start");
             }
         }
 
@@ -67,7 +67,7 @@ namespace Motor_Control
         {
             if (Dev != null)
             {
-                Dev.thePLC.Write("DB6.DBX0.0",false);
+                Dev.Write(0, "Start");
             }
         }
 
@@ -75,7 +75,7 @@ namespace Motor_Control
         {
             if (Dev != null)
             {
-                Dev.thePLC.Write("DB6.DBX0.1", true);
+                Dev.Write(1, "Stop");
             }
         }
 
@@ -83,7 +83,7 @@ namespace Motor_Control
         {
             if (Dev != null)
             {
-                Dev.thePLC.Write("DB6.DBX0.1", false);
+                Dev.Write(0, "Stop");
             }
         }
 
