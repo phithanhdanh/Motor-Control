@@ -72,7 +72,6 @@
     <Compile Include="Main.Designer.cs">
       <DependentUpon>Main.cs</DependentUpon>
     </Compile>
-    <Compile Include="ModbusDevice.cs" />
     <Compile Include="Motor.cs" />
     <Compile Include="Motor_Faceplate.cs">
       <SubType>Form</SubType>
