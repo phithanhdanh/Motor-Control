@@ -12,7 +12,6 @@ namespace Motor_Control
         public List<Device> Devices = new List<Device>();
         public List<Motor> Motors = new List<Motor>();
         
-        public List<ModbusDevice> ModbusDevices = new List<ModbusDevice>();
 
         public short Level;
         System.Timers.Timer UpdateTimer = null;
@@ -29,22 +28,6 @@ namespace Motor_Control
 
         }
 
-        public void AddModbusDevice(ModbusDevice dev)
-        {
-            ModbusDevices.Add(dev);
-        }
-
-        public ModbusDevice FindModbusDevice(string name)
-        {
-            foreach (ModbusDevice dev in ModbusDevices)
-            {
-                if (dev.Name == name)
-                {
-                    return dev;
-                }
-            }
-            return null;
-        }
 
         public void AddDevice(Device dev)
         {

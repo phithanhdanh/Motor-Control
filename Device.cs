@@ -5,6 +5,7 @@ using System.Net.Sockets;
 using System.Runtime.Remoting.Activation;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Forms.VisualStyles;
 using System.Xml.Linq;
 using NModbus;
 using S7.Net;
@@ -56,7 +57,14 @@ namespace Motor_Control
         private void UpdateTimer_Tags(object sender, System.Timers.ElapsedEventArgs e)
         {
             ushort[] ob = Master.ReadHoldingRegisters(ID, 100, 4);
+            Motor_1_Data.Update(ob);
+            ob = Master.ReadHoldingRegisters(ID, 104, 4);
+            Motor_2_Data.Update(ob);
+            ob = Master.ReadHoldingRegisters(ID, 108, 4);
+            Motor_3_Data.Update(ob);
 
+            ob = Master.ReadHoldingRegisters(ID, 114, 1);
+            Level = (short)ob[0];
 
             //Console.WriteLine($"Motor_1_Data: {Motor_1_Data.Mode} {Motor_1_Data.Runfeedback}");
             //Console.WriteLine($"Motor_2_Data: {Motor_2_Data.Mode} {Motor_2_Data.Runfeedback}");
@@ -67,22 +75,23 @@ namespace Motor_Control
         public void Write(object value, string tagname)
         {
             string[] s = tagname.Split('.');
+            ushort tmp = (ushort)value;
             switch (s[0])
             {
                 case "Motor_1":
                     switch (s[1])
                     {
                         case "Mode":
-                            thePLC.Write("DB1.DBW0",value);
+                            Master.WriteSingleRegister(ID, 100, tmp);
                             break;
                         case "Start":
-                            thePLC.Write("DB1.DBX2.0", value);
+                            Master.WriteSingleRegister(ID, 101, tmp);
                             break;
                         case "Stop":
-                            thePLC.Write("DB1.DBX2.1", value);
+                            Master.WriteSingleRegister(ID, 101, (ushort)(tmp << 7));
                             break;
                         case "Reset":
-                            thePLC.Write("DB1.DBX2.5", value);
+                            Master.WriteSingleRegister(ID, 102, (ushort)(tmp << 7));
                             break;
                     }
                     break;
@@ -90,16 +99,16 @@ namespace Motor_Control
                     switch (s[1])
                     {
                         case "Mode":
-                            thePLC.Write("DB2.DBW0", value);
+                            Master.WriteSingleRegister(ID, 104, tmp);
                             break;
                         case "Start":
-                            thePLC.Write("DB2.DBX2.0", value);
+                            Master.WriteSingleRegister(ID, 105, tmp);
                             break;
                         case "Stop":
-                            thePLC.Write("DB2.DBX2.1", value);
+                            Master.WriteSingleRegister(ID, 105, (ushort)(tmp << 7));
                             break;
                         case "Reset":
-                            thePLC.Write("DB2.DBX2.5", value);
+                            Master.WriteSingleRegister(ID, 106, (ushort)(tmp << 7));
                             break;
                     }
                     break;
@@ -107,16 +116,16 @@ namespace Motor_Control
                     switch (s[1])
                     {
                         case "Mode":
-                            thePLC.Write("DB3.DBW0", value);
+                            Master.WriteSingleRegister(ID, 108, tmp);
                             break;
                         case "Start":
-                            thePLC.Write("DB3.DBX2.0", value);
+                            Master.WriteSingleRegister(ID, 109, tmp);
                             break;
                         case "Stop":
-                            thePLC.Write("DB3.DBX2.1", value);
+                            Master.WriteSingleRegister(ID, 109, (ushort)(tmp << 7));
                             break;
                         case "Reset":
-                            thePLC.Write("DB3.DBX2.5", value);
+                            Master.WriteSingleRegister(ID, 110, (ushort)(tmp << 7));
                             break;
                     }
                     break;
@@ -130,24 +139,21 @@ namespace Motor_Control
         public ushort Mode;
         public bool Start;
         public bool Stop;
-        public bool RunCondition;
-        public bool StopCondition;
+        //public bool RunCondition;
+        //public bool StopCondition;
         public bool Runfeedback;
         public bool Reset;
         //public byte Output;
         //public bool Cmd;
         public bool Fault;
-        public void Read_Modbus()
+        public void Update(ushort[] ob)
         {
-            ushort[] ob = Master.ReadHoldingRegisters(ID, StartAddress, 4);
             Mode = ob[0];
             Start = Convert.ToBoolean(ob[1] & 0x0001);
-            Stop = Convert.ToBoolean((ob[1] >> 8) & 0x0001);
-            RunCondition = Convert.ToBoolean(ob[2] & 0x0001);
-            StopCondition = Convert.ToBoolean((ob[2] >> 8) & 0x0001);
-            Runfeedback = Convert.ToBoolean(ob[3] & 0x0001);
-            Reset = Convert.ToBoolean((ob[3] >> 8) & 0x0001);
-            Fault = Convert.ToBoolean(ob[4] & 0x0001);
+            Stop = Convert.ToBoolean((ob[1] >> 7) & 0x0001);
+            Runfeedback = Convert.ToBoolean(ob[2] & 0x0001);
+            Reset = Convert.ToBoolean((ob[2] >> 7) & 0x0001);
+            Fault = Convert.ToBoolean(ob[3] & 0x0001);
         }
 
     }

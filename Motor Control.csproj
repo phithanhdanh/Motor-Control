@@ -39,9 +39,6 @@
     <Reference Include="NModbus, Version=3.0.72.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>packages\NModbus.3.0.72\lib\net46\NModbus.dll</HintPath>
     </Reference>
-    <Reference Include="S7.Net">
-      <HintPath>..\S7 Communication\bin\Debug\S7.Net.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Windows.Forms.DataVisualization" />
