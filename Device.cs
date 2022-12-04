@@ -55,13 +55,8 @@ namespace Motor_Control
         }
         private void UpdateTimer_Tags(object sender, System.Timers.ElapsedEventArgs e)
         {
-            
-            thePLC.ReadClass(Motor_1_Data, 1);
-            thePLC.ReadClass(Motor_2_Data, 2);
-            thePLC.ReadClass(Motor_3_Data, 3);
+            ushort[] ob = Master.ReadHoldingRegisters(ID, 100, 4);
 
-            object ob = thePLC.Read("MW100");
-            Level = (short) Convert.ToInt16((ushort)ob);
 
             //Console.WriteLine($"Motor_1_Data: {Motor_1_Data.Mode} {Motor_1_Data.Runfeedback}");
             //Console.WriteLine($"Motor_2_Data: {Motor_2_Data.Mode} {Motor_2_Data.Runfeedback}");
@@ -131,9 +126,6 @@ namespace Motor_Control
 
     public class Motor_Data
     {
-        private ushort StartAddress;
-        private IModbusMaster Master;
-        private byte ID;
 
         public ushort Mode;
         public bool Start;
@@ -145,12 +137,6 @@ namespace Motor_Control
         //public byte Output;
         //public bool Cmd;
         public bool Fault;
-        public Modbus_Motor_Data(IModbusMaster master, byte id, ushort address)
-        {
-            StartAddress = address;
-            Master = master;
-            ID = id;
-        }
         public void Read_Modbus()
         {
             ushort[] ob = Master.ReadHoldingRegisters(ID, StartAddress, 4);
