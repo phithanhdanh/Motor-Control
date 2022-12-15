@@ -8,17 +8,17 @@ using System.Threading.Tasks;
 using System.Windows.Forms.VisualStyles;
 using System.Xml.Linq;
 using NModbus;
+using Opc.UaFx.Client;
 
 namespace Motor_Control
 {
     public class Device
     {
-        public string IP;
+        public string OpcUrl;
         public string Name;
-        public int Port;
-        public byte ID;
-        public TcpClient Client = null;
-        public IModbusMaster Master = null;
+        public byte NameSpaceIndex;
+        public OpcClient thePLC = null;
+
 
         public bool Start;
         public bool Stop;
@@ -30,11 +30,10 @@ namespace Motor_Control
 
 
         System.Timers.Timer UpdateTimer = null;
-        public Device(string ip, int port, byte id, string name)
+        public Device(string opcurl, byte namespaceindex, string name)
         {
-            IP = ip;
-            Port = port;
-            ID = id;
+            OpcUrl= opcurl;
+            NameSpaceIndex= namespaceindex;
             Name = name;
 
             UpdateTimer = new System.Timers.Timer(500);
@@ -42,15 +41,13 @@ namespace Motor_Control
 
             try
             {
-                Client = new TcpClient(IP, Port);
-                var factory = new ModbusFactory();
-                Master = factory.CreateMaster(Client);
-                Console.WriteLine($"Connect to the PLC {Name} {IP} successfully");
+                thePLC = new OpcClient(OpcUrl);
+                Console.WriteLine($"Connect to the PLC {Name} {OpcUrl} successfully");
                 UpdateTimer.Enabled = true;
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Cannot connect to the PLC {IP}: {ex.Message}");
+                Console.WriteLine($"Cannot connect to the PLC {OpcUrl}: {ex.Message}");
             }
         }
         private void UpdateTimer_Tags(object sender, System.Timers.ElapsedEventArgs e)
