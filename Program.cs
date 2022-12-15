@@ -18,9 +18,6 @@ namespace Motor_Control
 
         static void Main()
         {
-            //ModbusDevice PLC_2 = new ModbusDevice("127.0.0.1", 502, 255, "PLC_2");
-            //Root.AddModbusDevice(PLC_2);
-
             Device PLC_1 = new Device("opc.tcp://192.168.1.201:4840/",3, "PLC_1");
             Root.AddDevice(PLC_1);
 
