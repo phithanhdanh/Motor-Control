@@ -52,16 +52,13 @@ namespace Motor_Control
         }
         private void UpdateTimer_Tags(object sender, System.Timers.ElapsedEventArgs e)
         {
-            ushort[] ob = Master.ReadHoldingRegisters(ID, 100, 4);
-            Motor_1_Data.Update(ob);
-            ob = Master.ReadHoldingRegisters(ID, 104, 4);
-            Motor_2_Data.Update(ob);
-            ob = Master.ReadHoldingRegisters(ID, 108, 4);
-            Motor_3_Data.Update(ob);
+            ReadClass(Motor_1_Data, "MOTOR_1");
+            ReadClass(Motor_2_Data, "MOTOR_2");
+            ReadClass(Motor_3_Data, "MOTOR_3");
 
-            ob = Master.ReadHoldingRegisters(ID, 114, 1);
-            Level = (short)ob[0];
-
+            var value = thePLC.ReadNode($"ns={NameSpaceIndex};s=\"LEVEL\"");
+            Level = (short)value.Value;
+            
             //Console.WriteLine($"Motor_1_Data: {Motor_1_Data.Mode} {Motor_1_Data.Runfeedback}");
             //Console.WriteLine($"Motor_2_Data: {Motor_2_Data.Mode} {Motor_2_Data.Runfeedback}");
             //Console.WriteLine($"Motor_3_Data: {Motor_3_Data.Mode} {Motor_3_Data.Runfeedback}");
@@ -71,72 +68,96 @@ namespace Motor_Control
         public void Write(object value, string tagname)
         {
             string[] s = tagname.Split('.');
-            ushort tmp = (ushort) Convert.ToInt16(value);
+            //ushort tmp = (ushort) Convert.ToInt16(value);
+            string tagName = $"ns={NameSpaceIndex};s=";
             switch (s[0])
             {
                 case "Motor_1":
+                    tagName = tagName + "\"MOTOR_1\"";
                     switch (s[1])
                     {
                         case "Mode":
-                            Master.WriteSingleRegister(ID, 100, tmp);
+                            tagName = tagName + ".\"MODE\"";
                             break;
                         case "Start":
-                            Master.WriteSingleRegister(ID, 101, tmp);
+                            tagName = tagName + ".\"START\"";
                             break;
                         case "Stop":
-                            Master.WriteSingleRegister(ID, 101, (ushort)(tmp << 7));
+                            tagName = tagName + ".\"STOP\"";
                             break;
                         case "Reset":
-                            Master.WriteSingleRegister(ID, 102, (ushort)(tmp << 7));
+                            tagName = tagName + ".\"RESET\"";
                             break;
                     }
                     break;
                 case "Motor_2":
+                    tagName = tagName + "\"MOTOR_2\"";
                     switch (s[1])
                     {
                         case "Mode":
-                            Master.WriteSingleRegister(ID, 104, tmp);
+                            tagName = tagName + ".\"MODE\"";
                             break;
                         case "Start":
-                            Master.WriteSingleRegister(ID, 105, tmp);
+                            tagName = tagName + ".\"START\"";
                             break;
                         case "Stop":
-                            Master.WriteSingleRegister(ID, 105, (ushort)(tmp << 7));
+                            tagName = tagName + ".\"STOP\"";
                             break;
                         case "Reset":
-                            Master.WriteSingleRegister(ID, 106, (ushort)(tmp << 7));
+                            tagName = tagName + ".\"RESET\"";
                             break;
                     }
                     break;
                 case "Motor_3":
+                    tagName = tagName + "\"MOTOR_3\"";
                     switch (s[1])
                     {
                         case "Mode":
-                            Master.WriteSingleRegister(ID, 108, tmp);
+                            tagName = tagName + ".\"MODE\"";
                             break;
                         case "Start":
-                            Master.WriteSingleRegister(ID, 109, tmp);
+                            tagName = tagName + ".\"START\"";
                             break;
                         case "Stop":
-                            Master.WriteSingleRegister(ID, 109, (ushort)(tmp << 7));
+                            tagName = tagName + ".\"STOP\"";
                             break;
                         case "Reset":
-                            Master.WriteSingleRegister(ID, 110, (ushort)(tmp << 7));
+                            tagName = tagName + ".\"RESET\"";
                             break;
                     }
                     break;
                 case "Start":
-                    Master.WriteSingleRegister(ID, 112, tmp);
+                    tagName = tagName + "\"CTRL_PANEL\".\"START\"";
                     break;
                 case "Stop":
-                    Master.WriteSingleRegister(ID, 112, (ushort)(tmp << 7));
+                    tagName = tagName + "\"CTRL_PANEL\".\"STOP\"";
                     break;
             }
+            thePLC.WriteNode(tagName, value);
+            
         }
 
-        private void ReadClass(Motor_Data motor_Data,string name)
+        private void ReadClass(Motor_Data motor_data,string name)
         {
+            string tagName = $"ns={NameSpaceIndex};s=\"{name}\".";
 
+            var value = thePLC.ReadNode(tagName + "\"MODE\"");
+            motor_data.Mode = (ushort)value.Value;
+
+            value = thePLC.ReadNode(tagName + "\"START\"");
+            motor_data.Start = (bool)value.Value;
+
+            value = thePLC.ReadNode(tagName + "\"STOP\"");
+            motor_data.Stop = (bool)value.Value;
+
+            value = thePLC.ReadNode(tagName + "\"RUNFEEDBACK\"");
+            motor_data.Runfeedback = (bool)value.Value;
+
+            value = thePLC.ReadNode(tagName + "\"RESET\"");
+            motor_data.Reset = (bool)value.Value;
+
+            value = thePLC.ReadNode(tagName + "\"FAULT\"");
+            motor_data.Fault = (bool)value.Value;
         }
     }
 
@@ -153,16 +174,6 @@ namespace Motor_Control
         //public byte Output;
         //public bool Cmd;
         public bool Fault;
-        
-        public void Update(ushort[] ob)
-        {
-            Mode = ob[0];
-            Start = Convert.ToBoolean(ob[1] & 0x0001);
-            Stop = Convert.ToBoolean((ob[1] >> 7) & 0x0001);
-            Runfeedback = Convert.ToBoolean(ob[2] & 0x0001);
-            Reset = Convert.ToBoolean((ob[2] >> 7) & 0x0001);
-            Fault = Convert.ToBoolean(ob[3] & 0x0001);
-        }
-
+  
     }
 }
