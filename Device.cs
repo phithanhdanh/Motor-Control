@@ -133,6 +133,11 @@ namespace Motor_Control
                     break;
             }
         }
+
+        private void ReadClass(Motor_Data motor_Data,string name)
+        {
+
+        }
     }
 
     public class Motor_Data
@@ -148,6 +153,7 @@ namespace Motor_Control
         //public byte Output;
         //public bool Cmd;
         public bool Fault;
+        
         public void Update(ushort[] ob)
         {
             Mode = ob[0];
